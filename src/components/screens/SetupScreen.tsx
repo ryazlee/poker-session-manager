@@ -1,3 +1,6 @@
+import React from 'react'
+import { handleCurrencyInput, formatCurrencyInput } from '../../utils/currency'
+
 interface SetupScreenProps {
   buyInAmount: string
   setBuyInAmount: (amount: string) => void
@@ -5,17 +8,24 @@ interface SetupScreenProps {
 }
 
 export default function SetupScreen({ buyInAmount, setBuyInAmount, onStartGame }: SetupScreenProps) {
+  const handleBuyInChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleCurrencyInput(e.target.value, setBuyInAmount)
+  }
+
+  const displayValue = formatCurrencyInput(buyInAmount)
+
   return (
     <div className="min-h-screen bg-gray-900 p-6 flex flex-col items-center justify-center">
       <h1 className="text-2xl text-white mb-8">Poker Session Manager</h1>
 
       <div className="w-full max-w-xs space-y-4">
         <input
-          type="number"
-          value={buyInAmount}
-          onChange={(e) => setBuyInAmount(e.target.value)}
+          type="text"
+          value={displayValue}
+          onChange={handleBuyInChange}
+          onKeyDown={(e) => e.key === 'Enter' && onStartGame()}
           className="w-full px-4 py-3 bg-gray-800 text-white rounded placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white"
-          placeholder="Buy-in amount"
+          placeholder="Buy-in Amount (e.g., $20)"
         />
 
         <button

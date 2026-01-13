@@ -39,7 +39,7 @@ export default function ActiveGameScreen({
             value={newPlayerName}
             onChange={(e) => setNewPlayerName(e.target.value)}
             placeholder="Player name"
-            onKeyPress={(e) => e.key === 'Enter' && onAddPlayer()}
+            onKeyDown={(e) => e.key === 'Enter' && onAddPlayer()}
             className="flex-1 px-3 py-2 bg-gray-800 text-white rounded placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white text-sm"
           />
           <button

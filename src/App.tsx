@@ -158,12 +158,12 @@ function App() {
   const updateFinalAmount = (playerId: string, amount: string) => {
     if (!session) return
 
-    const numAmount = parseFloat(amount) || 0
+    // Keep as string to preserve user input like "25.50"
     setSession({
       ...session,
       players: session.players.map(player =>
         player.id === playerId
-          ? { ...player, finalAmount: numAmount }
+          ? { ...player, finalAmount: amount }
           : player
       )
     })
@@ -173,14 +173,14 @@ function App() {
     localStorage.removeItem('pokerSession')
     setSession(null)
     setGameState('setup')
-    setBuyInAmount('20')
+    setBuyInAmount('')
   }
 
   const calculateTotals = () => {
     if (!session) return { totalBuyIns: 0, totalFinal: 0, difference: 0 }
 
     const totalBuyIns = session.players.reduce((sum, player) => sum + (player.buyIns * session.buyInAmount), 0)
-    const totalFinal = session.players.reduce((sum, player) => sum + (player.finalAmount || 0), 0)
+    const totalFinal = session.players.reduce((sum, player) => sum + (parseFloat(player.finalAmount || '0') || 0), 0)
 
     return {
       totalBuyIns,
@@ -189,7 +189,7 @@ function App() {
     }
   }
 
-  const formatCurrency = (amount: number) => `$${amount.toFixed(2)}`
+  const formatCurrency = (amount: number) => amount > 0 ? `$${amount.toFixed(2)}` : `-$${Math.abs(amount).toFixed(2)}`
 
   if (gameState === 'setup') {
     return (
@@ -239,7 +239,7 @@ function App() {
           setSession(null)
           localStorage.removeItem('pokerSession')
           setGameState('setup')
-          setBuyInAmount('20')
+          setBuyInAmount('')
         }}
         formatCurrency={formatCurrency}
         calculateTotals={calculateTotals}
