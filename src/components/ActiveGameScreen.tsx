@@ -1,5 +1,5 @@
-import type { GameSession } from '../types'
-import PlayerCard from './PlayerCard'
+import type { GameSession } from "../types"
+import PlayerCard from "./PlayerCard"
 
 interface ActiveGameScreenProps {
   session: GameSession
@@ -25,32 +25,32 @@ export default function ActiveGameScreen({
   formatCurrency
 }: ActiveGameScreenProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4">
+    <div className="min-h-screen bg-gray-900 p-4">
       <div className="max-w-md mx-auto">
         <div className="text-center mb-6">
-          <h1 className="text-lg font-medium text-white mb-1">🃏 Active Game</h1>
-          <p className="text-slate-400">Buy-in: {formatCurrency(session.buyInAmount)}</p>
+          <h1 className="text-lg text-white mb-1">🃏 Game</h1>
+          <p className="text-gray-400 text-sm">{formatCurrency(session.buyInAmount)} buy-in</p>
         </div>
 
-        <div className="flex gap-2 mb-6">
+        <div className="flex gap-2 mb-4">
           <input
             type="text"
             value={newPlayerName}
             onChange={(e) => setNewPlayerName(e.target.value)}
             placeholder="Player name"
             onKeyPress={(e) => e.key === 'Enter' && onAddPlayer()}
-            className="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+            className="flex-1 px-3 py-2 bg-gray-800 text-white rounded placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white text-sm"
           />
           <button
             onClick={onAddPlayer}
             disabled={!newPlayerName.trim()}
-            className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-slate-600 text-white rounded-lg text-sm font-medium transition-colors touch-manipulation"
+            className="px-4 py-2 bg-white hover:bg-gray-100 disabled:bg-gray-700 text-black disabled:text-gray-500 rounded text-sm font-medium"
           >
             Add
           </button>
         </div>
 
-        <div className="space-y-3 mb-8">
+        <div className="space-y-2 mb-6">
           {session.players.map((player) => (
             <PlayerCard
               key={player.id}
@@ -66,16 +66,16 @@ export default function ActiveGameScreen({
         <div className="flex gap-3">
           <button
             onClick={onReset}
-            className="flex-1 py-3 border border-white/20 text-white rounded-lg font-medium transition-colors touch-manipulation"
+            className="flex-1 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded text-sm"
           >
             Reset
           </button>
           <button
             onClick={onGoToLedger}
             disabled={session.players.length === 0}
-            className="flex-1 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 text-white rounded-lg font-medium transition-colors touch-manipulation"
+            className="flex-1 py-3 bg-white hover:bg-gray-100 disabled:bg-gray-700 text-black disabled:text-gray-500 rounded text-sm font-medium"
           >
-            Final Count
+            Count
           </button>
         </div>
       </div>
