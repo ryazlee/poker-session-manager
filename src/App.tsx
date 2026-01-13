@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import type { GameSession, Player, GameState } from './types'
+import type { GameSession, Player, GameState, AuditEntry } from './types'
 import SetupScreen from './components/screens/SetupScreen'
 import ActiveGameScreen from './components/screens/ActiveGameScreen'
 import LedgerScreen from './components/screens/LedgerScreen'
@@ -16,6 +16,10 @@ function App() {
     const savedSession = localStorage.getItem('pokerSession')
     if (savedSession) {
       const parsed = JSON.parse(savedSession)
+      // Ensure auditTrail exists for backward compatibility
+      if (!parsed.auditTrail) {
+        parsed.auditTrail = []
+      }
       setSession(parsed)
       if (parsed.isActive) {
         setGameState('active')
@@ -30,11 +34,32 @@ function App() {
     }
   }, [session])
 
+  const addAuditEntry = (entry: Omit<AuditEntry, 'id' | 'timestamp' | 'totalPot'>) => {
+    if (!session) return
+
+    const totalPot = session.players.reduce((sum, player) =>
+      sum + (player.buyIns * session.buyInAmount), 0
+    )
+
+    const auditEntry: AuditEntry = {
+      ...entry,
+      id: Date.now().toString(),
+      timestamp: new Date(),
+      totalPot
+    }
+
+    setSession(prev => prev ? {
+      ...prev,
+      auditTrail: [...prev.auditTrail, auditEntry]
+    } : null)
+  }
+
   const startNewGame = () => {
     const newSession: GameSession = {
       id: Date.now().toString(),
       buyInAmount: parseFloat(buyInAmount) || 20,
       players: [],
+      auditTrail: [],
       isActive: true,
       createdAt: new Date()
     }
@@ -55,28 +80,78 @@ function App() {
       ...session,
       players: [...session.players, newPlayer]
     })
+
+    // Add to audit trail
+    addAuditEntry({
+      playerId: newPlayer.id,
+      playerName: newPlayer.name,
+      action: 'add_player',
+      newBuyIns: 1
+    })
+
     setNewPlayerName('')
   }
 
   const updateBuyIns = (playerId: string, change: number) => {
     if (!session) return
 
-    setSession({
+    const player = session.players.find(p => p.id === playerId)
+    if (!player) return
+
+    const newBuyIns = Math.max(0, player.buyIns + change)
+
+    // Update session first
+    const updatedSession = {
       ...session,
-      players: session.players.map(player =>
-        player.id === playerId
-          ? { ...player, buyIns: Math.max(0, player.buyIns + change) }
-          : player
+      players: session.players.map(p =>
+        p.id === playerId
+          ? { ...p, buyIns: newBuyIns }
+          : p
       )
-    })
+    }
+
+    setSession(updatedSession)
+
+    // Track all buy-in changes (increases and decreases) with updated pot
+    if (change !== 0 && newBuyIns !== player.buyIns) {
+      const totalPot = updatedSession.players.reduce((sum, p) =>
+        sum + (p.buyIns * session.buyInAmount), 0
+      )
+
+      const auditEntry: AuditEntry = {
+        playerId: player.id,
+        playerName: player.name,
+        action: 'rebuy',
+        previousBuyIns: player.buyIns,
+        newBuyIns: newBuyIns,
+        id: Date.now().toString(),
+        timestamp: new Date(),
+        totalPot
+      }
+
+      setSession(prev => prev ? {
+        ...prev,
+        auditTrail: [...prev.auditTrail, auditEntry]
+      } : null)
+    }
   }
 
   const removePlayer = (playerId: string) => {
     if (!session) return
 
+    const player = session.players.find(p => p.id === playerId)
+    if (!player) return
+
+    // Add to audit trail
+    addAuditEntry({
+      playerId: player.id,
+      playerName: player.name,
+      action: 'remove_player'
+    })
+
     setSession({
       ...session,
-      players: session.players.filter(player => player.id !== playerId)
+      players: session.players.filter(p => p.id !== playerId)
     })
   }
 
@@ -160,7 +235,12 @@ function App() {
       <SummaryScreen
         session={session}
         onGoBack={() => setGameState('ledger')}
-        onNewGame={resetGame}
+        onNewGame={() => {
+          setSession(null)
+          localStorage.removeItem('pokerSession')
+          setGameState('setup')
+          setBuyInAmount('20')
+        }}
         formatCurrency={formatCurrency}
         calculateTotals={calculateTotals}
       />

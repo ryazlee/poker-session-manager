@@ -5,10 +5,22 @@ export interface Player {
   finalAmount?: number
 }
 
+export interface AuditEntry {
+  id: string
+  timestamp: Date
+  playerId: string
+  playerName: string
+  action: 'rebuy' | 'add_player' | 'remove_player'
+  previousBuyIns?: number
+  newBuyIns?: number
+  totalPot: number
+}
+
 export interface GameSession {
   id: string
   buyInAmount: number
   players: Player[]
+  auditTrail: AuditEntry[]
   isActive: boolean
   createdAt: Date
 }

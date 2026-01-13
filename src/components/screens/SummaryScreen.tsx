@@ -1,4 +1,5 @@
 import type { GameSession } from "../../types"
+import AuditTrail from "../AuditTrail"
 
 interface SummaryScreenProps {
   session: GameSession
@@ -75,6 +76,14 @@ export default function SummaryScreen({
               <span className="text-green-400">{winners[0]?.name || 'None'}</span>
             </div>
           </div>
+        </div>
+
+        <div className="mb-6">
+          <AuditTrail
+            auditTrail={session.auditTrail}
+            formatCurrency={formatCurrency}
+            defaultCollapsed={true}
+          />
         </div>
 
         <div className="flex gap-3">

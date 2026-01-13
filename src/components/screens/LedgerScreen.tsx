@@ -1,4 +1,5 @@
 import type { GameSession } from "../../types"
+import AuditTrail from "../AuditTrail"
 import LedgerRow from "../LedgerRow"
 
 interface LedgerScreenProps {
@@ -61,6 +62,14 @@ export default function LedgerScreen({
             }`}>
             {isBalanced ? '✓ Balanced' : '⚠ Check amounts'}
           </div>
+        </div>
+
+        <div className="mb-6">
+          <AuditTrail
+            auditTrail={session.auditTrail}
+            formatCurrency={formatCurrency}
+            defaultCollapsed={true}
+          />
         </div>
 
         <div className="flex gap-3">

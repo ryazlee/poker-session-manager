@@ -1,5 +1,6 @@
 import type { GameSession } from "../../types"
 import PlayerCard from "../PlayerCard"
+import AuditTrail from "../AuditTrail"
 
 interface ActiveGameScreenProps {
   session: GameSession
@@ -28,7 +29,7 @@ export default function ActiveGameScreen({
     <div className="min-h-screen bg-gray-900 p-4">
       <div className="max-w-md mx-auto">
         <div className="text-center mb-6">
-          <h1 className="text-lg text-white mb-1">🃏 Game</h1>
+          <h1 className="text-lg text-white mb-1">Game</h1>
           <p className="text-gray-400 text-sm">{formatCurrency(session.buyInAmount)} buy-in</p>
         </div>
 
@@ -61,6 +62,14 @@ export default function ActiveGameScreen({
               formatCurrency={formatCurrency}
             />
           ))}
+        </div>
+
+        <div className="mb-6">
+          <AuditTrail
+            auditTrail={session.auditTrail}
+            formatCurrency={formatCurrency}
+            defaultCollapsed={true}
+          />
         </div>
 
         <div className="flex gap-3">
