@@ -19,7 +19,7 @@ export default function SummaryScreen({
   const totals = calculateTotals()
   const playersWithPL = session.players.map(player => ({
     ...player,
-    profitLoss: (player.finalAmount || 0) - (player.buyIns * session.buyInAmount)
+    profitLoss: (Number(player.finalAmount) || 0) - (player.buyIns * session.buyInAmount)
   })).sort((a, b) => b.profitLoss - a.profitLoss)
 
   const winners = playersWithPL.filter(p => p.profitLoss > 0)
