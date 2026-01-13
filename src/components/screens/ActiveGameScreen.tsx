@@ -1,5 +1,5 @@
-import type { GameSession } from "../types"
-import PlayerCard from "./PlayerCard"
+import type { GameSession } from "../../types"
+import PlayerCard from "../PlayerCard"
 
 interface ActiveGameScreenProps {
   session: GameSession

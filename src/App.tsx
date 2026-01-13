@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react'
 import type { GameSession, Player, GameState } from './types'
-import SetupScreen from './components/SetupScreen'
-import ActiveGameScreen from './components/ActiveGameScreen'
-import LedgerScreen from './components/LedgerScreen'
-import SummaryScreen from './components/SummaryScreen'
+import SetupScreen from './components/screens/SetupScreen'
+import ActiveGameScreen from './components/screens/ActiveGameScreen'
+import LedgerScreen from './components/screens/LedgerScreen'
+import SummaryScreen from './components/screens/SummaryScreen'
 
 function App() {
   const [gameState, setGameState] = useState<GameState>('setup')
   const [session, setSession] = useState<GameSession | null>(null)
-  const [buyInAmount, setBuyInAmount] = useState<string>('20')
+  const [buyInAmount, setBuyInAmount] = useState<string>('')
   const [newPlayerName, setNewPlayerName] = useState('')
 
   // Load session from localStorage on mount

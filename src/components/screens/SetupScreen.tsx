@@ -7,7 +7,7 @@ interface SetupScreenProps {
 export default function SetupScreen({ buyInAmount, setBuyInAmount, onStartGame }: SetupScreenProps) {
   return (
     <div className="min-h-screen bg-gray-900 p-6 flex flex-col items-center justify-center">
-      <h1 className="text-2xl text-white mb-8">🃏 Poker</h1>
+      <h1 className="text-2xl text-white mb-8">Poker Session Manager</h1>
 
       <div className="w-full max-w-xs space-y-4">
         <input

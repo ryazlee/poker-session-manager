@@ -1,4 +1,4 @@
-import type { GameSession } from "../types"
+import type { GameSession } from "../../types"
 
 interface SummaryScreenProps {
   session: GameSession
@@ -28,7 +28,7 @@ export default function SummaryScreen({
     <div className="min-h-screen bg-gray-900 p-4">
       <div className="max-w-md mx-auto">
         <div className="text-center mb-6">
-          <h1 className="text-lg text-white mb-1">📊 Summary</h1>
+          <h1 className="text-lg text-white mb-1">Summary</h1>
           <p className="text-gray-400 text-sm">{formatCurrency(session.buyInAmount)} • {session.players.length} players</p>
         </div>
 
