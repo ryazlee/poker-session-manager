@@ -5,14 +5,81 @@ import ActiveGameScreen from './components/screens/ActiveGameScreen'
 import LedgerScreen from './components/screens/LedgerScreen'
 import SummaryScreen from './components/screens/SummaryScreen'
 
+// URL state encoding/decoding utilities
+// Format: #buyIn=20&state=active&players=Alice:2:40,Bob:1:15
+// Each player is name:buyIns:finalAmount (finalAmount optional)
+function encodeSessionToURL(session: GameSession, gameState: GameState): string {
+  const params = new URLSearchParams()
+  params.set('buyIn', session.buyInAmount.toString())
+  params.set('state', gameState)
+  
+  const playerStrings = session.players.map(p => {
+    const parts = [encodeURIComponent(p.name), p.buyIns.toString()]
+    if (p.finalAmount !== undefined) {
+      parts.push(p.finalAmount)
+    }
+    return parts.join(':')
+  })
+  
+  if (playerStrings.length > 0) {
+    params.set('players', playerStrings.join(','))
+  }
+  
+  return params.toString()
+}
+
+function decodeSessionFromURL(hash: string): { session: GameSession; gameState: GameState } | null {
+  try {
+    const params = new URLSearchParams(hash)
+    const buyIn = parseFloat(params.get('buyIn') || '')
+    const state = params.get('state') as GameState
+    const playersStr = params.get('players') || ''
+    
+    if (isNaN(buyIn) || !state) return null
+    
+    const players: Player[] = playersStr ? playersStr.split(',').map((p, i) => {
+      const [name, buyIns, finalAmount] = p.split(':')
+      return {
+        id: Date.now().toString() + i,
+        name: decodeURIComponent(name),
+        buyIns: parseInt(buyIns) || 1,
+        finalAmount: finalAmount
+      }
+    }) : []
+    
+    const session: GameSession = {
+      id: Date.now().toString(),
+      buyInAmount: buyIn,
+      players,
+      auditTrail: [],
+      isActive: state === 'active',
+      createdAt: new Date()
+    }
+    
+    return { session, gameState: state }
+  } catch {
+    return null
+  }
+}
+
 function App() {
   const [gameState, setGameState] = useState<GameState>('setup')
   const [session, setSession] = useState<GameSession | null>(null)
   const [buyInAmount, setBuyInAmount] = useState<string>('')
   const [newPlayerName, setNewPlayerName] = useState('')
 
-  // Load session from localStorage on mount
+  // Load session from URL hash first, then localStorage
   useEffect(() => {
+    const hash = window.location.hash.slice(1)
+    if (hash) {
+      const decoded = decodeSessionFromURL(hash)
+      if (decoded) {
+        setSession(decoded.session)
+        setGameState(decoded.gameState)
+        return
+      }
+    }
+    
     const savedSession = localStorage.getItem('pokerSession')
     if (savedSession) {
       const parsed = JSON.parse(savedSession)
@@ -26,6 +93,19 @@ function App() {
       }
     }
   }, [])
+
+  // Keep URL hash in sync with session state so users can copy URL directly
+  useEffect(() => {
+    if (session && gameState !== 'setup') {
+      const encoded = encodeSessionToURL(session, gameState)
+      window.history.replaceState(null, '', `#${encoded}`)
+    } else {
+      // Clear hash when no session or in setup
+      if (window.location.hash) {
+        window.history.replaceState(null, '', window.location.pathname)
+      }
+    }
+  }, [session, gameState])
 
   // Save session to localStorage whenever it changes
   useEffect(() => {

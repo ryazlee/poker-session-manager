@@ -23,6 +23,7 @@ export default function SummaryScreen({
   })).sort((a, b) => b.profitLoss - a.profitLoss)
 
   const winners = playersWithPL.filter(p => p.profitLoss > 0)
+  const breakEven = playersWithPL.filter(p => p.profitLoss === 0)
   const losers = playersWithPL.filter(p => p.profitLoss < 0)
 
   return (
@@ -55,6 +56,20 @@ export default function SummaryScreen({
                 <div key={player.id} className="bg-gray-800 rounded p-2 flex justify-between items-center">
                   <span className="text-white text-sm">{player.name}</span>
                   <span className="text-red-400 text-sm font-mono">{formatCurrency(player.profitLoss)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {breakEven.length > 0 && (
+          <div className="mb-4">
+            <h2 className="text-gray-400 text-sm mb-2">⚖️ Break Even</h2>
+            <div className="space-y-1">
+              {breakEven.map((player) => (
+                <div key={player.id} className="bg-gray-800 rounded p-2 flex justify-between items-center">
+                  <span className="text-white text-sm">{player.name}</span>
+                  <span className="text-gray-400 text-sm font-mono">$0.00</span>
                 </div>
               ))}
             </div>
