@@ -1,15 +1,15 @@
 import React from 'react'
 import type { Player } from "../types"
 import { handleCurrencyInput, formatCurrencyInput } from '../utils/currency'
+import { getPlayerTotalBuyIn } from '../utils/buyIns'
 
 interface LedgerRowProps {
   player: Player
-  buyInAmount: number
   onUpdateFinalAmount: (playerId: string, amount: string) => void
   formatCurrency: (amount: number) => string
 }
 
-export default function LedgerRow({ player, buyInAmount, onUpdateFinalAmount, formatCurrency }: LedgerRowProps) {
+export default function LedgerRow({ player, onUpdateFinalAmount, formatCurrency }: LedgerRowProps) {
   const handleFinalAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     handleCurrencyInput(e.target.value, (value) => onUpdateFinalAmount(player.id, value))
   }
@@ -20,7 +20,7 @@ export default function LedgerRow({ player, buyInAmount, onUpdateFinalAmount, fo
     <div className="bg-gray-800 rounded p-3 flex items-center justify-between">
       <div>
         <div className="text-white font-medium text-sm">{player.name}</div>
-        <div className="text-gray-400 text-xs">{formatCurrency(player.buyIns * buyInAmount)} in</div>
+        <div className="text-gray-400 text-xs">{formatCurrency(getPlayerTotalBuyIn(player))} in</div>
       </div>
       <input
         type="text"

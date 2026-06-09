@@ -35,7 +35,6 @@ export default function LedgerScreen({
             <LedgerRow
               key={player.id}
               player={player}
-              buyInAmount={session.buyInAmount}
               onUpdateFinalAmount={onUpdateFinalAmount}
               formatCurrency={formatCurrency}
             />

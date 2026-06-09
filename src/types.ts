@@ -1,7 +1,7 @@
 export interface Player {
   id: string
   name: string
-  buyIns: number
+  buyInAmounts: number[]
   finalAmount?: string
 }
 
@@ -10,9 +10,10 @@ export interface AuditEntry {
   timestamp: Date
   playerId: string
   playerName: string
-  action: 'rebuy' | 'add_player' | 'remove_player'
-  previousBuyIns?: number
-  newBuyIns?: number
+  action: 'rebuy' | 'custom_buyin' | 'cashout' | 'add_player' | 'remove_player'
+  amount?: number
+  previousTotal?: number
+  newTotal?: number
   totalPot: number
 }
 

@@ -7,10 +7,29 @@ interface AuditTrailProps {
   defaultCollapsed?: boolean
 }
 
+function getActionLabel(entry: AuditEntry): string {
+  switch (entry.action) {
+    case 'rebuy':
+      return `${entry.playerName} rebuy`
+    case 'custom_buyin':
+      return `${entry.playerName} custom buy-in`
+    case 'cashout':
+      return `${entry.playerName} cashout`
+    case 'add_player':
+      return `${entry.playerName} joined`
+    case 'remove_player':
+      return `${entry.playerName} left`
+    default:
+      return entry.playerName
+  }
+}
+
 export default function AuditTrail({ auditTrail, formatCurrency, defaultCollapsed = true }: AuditTrailProps) {
   const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed)
 
   if (auditTrail.length === 0) return null
+
+  const entries = [...auditTrail].reverse()
 
   const formatTime = (timestamp: Date) => {
     const date = new Date(timestamp)
@@ -35,34 +54,27 @@ export default function AuditTrail({ auditTrail, formatCurrency, defaultCollapse
 
       {!isCollapsed && (
         <div className="mt-3 space-y-1 max-h-40 overflow-y-auto">
-          {auditTrail.map((entry, index) => {
-            const prevEntry = auditTrail[index - 1]
+          {entries.map((entry, index) => {
+            const prevEntry = entries[index + 1]
             const timeDiff = getTimeDiff(entry.timestamp, prevEntry?.timestamp)
 
             return (
               <div key={entry.id} className="text-xs text-gray-300 bg-gray-700 rounded p-2">
                 <div className="flex justify-between items-center">
-                  <span className="font-medium">
-                    {entry.action === 'rebuy' && entry.previousBuyIns !== undefined && entry.newBuyIns !== undefined && (
-                      entry.newBuyIns > entry.previousBuyIns ? `${entry.playerName} rebuy` :
-                        entry.newBuyIns < entry.previousBuyIns ? `${entry.playerName} cashout` :
-                          `${entry.playerName} buy-in adjusted`
-                    )}
-                    {entry.action === 'add_player' && `${entry.playerName} joined`}
-                    {entry.action === 'remove_player' && `${entry.playerName} left`}
-                  </span>
+                  <span className="font-medium">{getActionLabel(entry)}</span>
                   <span className="text-gray-500">
                     {formatTime(entry.timestamp)} {timeDiff}
                   </span>
                 </div>
-                {entry.action === 'rebuy' && (
+                {(entry.action === 'rebuy' || entry.action === 'custom_buyin' || entry.action === 'cashout' || entry.action === 'add_player') && (
                   <div className="text-gray-400">
-                    {entry.previousBuyIns} → {entry.newBuyIns} buy-ins • Pot: {formatCurrency(entry.totalPot)}
-                  </div>
-                )}
-                {entry.action === 'add_player' && (
-                  <div className="text-gray-400">
-                    Started with {entry.newBuyIns} buy-in • Pot: {formatCurrency(entry.totalPot)}
+                    {entry.amount !== undefined && (
+                      <span>{entry.action === 'cashout' ? '−' : '+'}{formatCurrency(entry.amount)}</span>
+                    )}
+                    {entry.newTotal !== undefined && (
+                      <span> • Total: {formatCurrency(entry.newTotal)}</span>
+                    )}
+                    <span> • Pot: {formatCurrency(entry.totalPot)}</span>
                   </div>
                 )}
               </div>

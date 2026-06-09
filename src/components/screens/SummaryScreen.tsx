@@ -1,5 +1,6 @@
 import type { GameSession } from "../../types"
 import AuditTrail from "../AuditTrail"
+import { getPlayerTotalBuyIn } from "../../utils/buyIns"
 
 interface SummaryScreenProps {
   session: GameSession
@@ -19,7 +20,7 @@ export default function SummaryScreen({
   const totals = calculateTotals()
   const playersWithPL = session.players.map(player => ({
     ...player,
-    profitLoss: (Number(player.finalAmount) || 0) - (player.buyIns * session.buyInAmount)
+    profitLoss: (Number(player.finalAmount) || 0) - getPlayerTotalBuyIn(player)
   })).sort((a, b) => b.profitLoss - a.profitLoss)
 
   const winners = playersWithPL.filter(p => p.profitLoss > 0)
@@ -84,7 +85,7 @@ export default function SummaryScreen({
             </div>
             <div className="flex justify-between">
               <span className="text-gray-400">Buy-ins:</span>
-              <span className="text-white">{session.players.reduce((sum, p) => sum + p.buyIns, 0)}</span>
+              <span className="text-white">{session.players.reduce((sum, p) => sum + p.buyInAmounts.length, 0)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-400">Winner:</span>

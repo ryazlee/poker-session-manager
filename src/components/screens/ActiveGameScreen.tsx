@@ -8,6 +8,7 @@ interface ActiveGameScreenProps {
   setNewPlayerName: (name: string) => void
   onAddPlayer: () => void
   onUpdateBuyIns: (playerId: string, change: number) => void
+  onAddCustomBuyIn: (playerId: string, amount: number) => void
   onRemovePlayer: (playerId: string) => void
   onGoToLedger: () => void
   onReset: () => void
@@ -20,6 +21,7 @@ export default function ActiveGameScreen({
   setNewPlayerName,
   onAddPlayer,
   onUpdateBuyIns,
+  onAddCustomBuyIn,
   onRemovePlayer,
   onGoToLedger,
   onReset,
@@ -58,6 +60,7 @@ export default function ActiveGameScreen({
               player={player}
               buyInAmount={session.buyInAmount}
               onUpdateBuyIns={onUpdateBuyIns}
+              onAddCustomBuyIn={onAddCustomBuyIn}
               onRemove={onRemovePlayer}
               formatCurrency={formatCurrency}
             />
