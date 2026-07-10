@@ -1,5 +1,6 @@
 import type { GameSession } from "../../types"
 import AuditTrail from "../AuditTrail"
+import ScreenHeader from "../ScreenHeader"
 import { getPlayerTotalBuyIn } from "../../utils/buyIns"
 
 interface SummaryScreenProps {
@@ -30,10 +31,10 @@ export default function SummaryScreen({
   return (
     <div className="min-h-screen bg-gray-900 p-4">
       <div className="max-w-md mx-auto">
-        <div className="text-center mb-6">
-          <h1 className="text-lg text-white mb-1">Summary</h1>
-          <p className="text-gray-400 text-sm">{formatCurrency(session.buyInAmount)} • {session.players.length} players</p>
-        </div>
+        <ScreenHeader
+          title="Summary"
+          subtitle={`${formatCurrency(session.buyInAmount)} • ${session.players.length} players`}
+        />
 
         {winners.length > 0 && (
           <div className="mb-4">

@@ -1,5 +1,6 @@
 import React from 'react'
 import { handleCurrencyInput, formatCurrencyInput } from '../../utils/currency'
+import AppIcon from '../AppIcon'
 
 interface SetupScreenProps {
   buyInAmount: string
@@ -16,6 +17,7 @@ export default function SetupScreen({ buyInAmount, setBuyInAmount, onStartGame }
 
   return (
     <div className="min-h-screen bg-gray-900 p-6 flex flex-col items-center justify-center">
+      <AppIcon size="lg" className="mb-4" />
       <h1 className="text-2xl text-white mb-8">Poker Session Manager</h1>
 
       <div className="w-full max-w-xs space-y-4">

@@ -1,6 +1,7 @@
 import type { GameSession } from "../../types"
 import AuditTrail from "../AuditTrail"
 import LedgerRow from "../LedgerRow"
+import ScreenHeader from "../ScreenHeader"
 
 interface LedgerScreenProps {
   session: GameSession
@@ -25,10 +26,10 @@ export default function LedgerScreen({
   return (
     <div className="min-h-screen bg-gray-900 p-4">
       <div className="max-w-md mx-auto">
-        <div className="text-center mb-6">
-          <h1 className="text-lg text-white mb-1">Count</h1>
-          <p className="text-gray-400 text-sm">{formatCurrency(session.buyInAmount)} buy-in</p>
-        </div>
+        <ScreenHeader
+          title="Count"
+          subtitle={`${formatCurrency(session.buyInAmount)} buy-in`}
+        />
 
         <div className="space-y-2 mb-4">
           {session.players.map((player) => (
