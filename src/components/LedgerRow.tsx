@@ -17,17 +17,17 @@ export default function LedgerRow({ player, onUpdateFinalAmount, formatCurrency 
   const displayValue = formatCurrencyInput(player.finalAmount || '')
 
   return (
-    <div className="bg-gray-800 rounded p-3 flex items-center justify-between">
+    <div className="bg-surface rounded-app border border-border p-3 flex items-center justify-between">
       <div>
-        <div className="text-white font-medium text-sm">{player.name}</div>
-        <div className="text-gray-400 text-xs">{formatCurrency(getPlayerTotalBuyIn(player))} in</div>
+        <div className="text-fg font-medium text-sm">{player.name}</div>
+        <div className="text-fg-muted text-xs">{formatCurrency(getPlayerTotalBuyIn(player))} in</div>
       </div>
       <input
         type="text"
         value={displayValue}
         onChange={handleFinalAmountChange}
         placeholder="$0.00"
-        className="w-20 px-2 py-1 bg-gray-700 text-white rounded text-sm focus:outline-none focus:ring-2 focus:ring-white text-right"
+        className="w-20 px-2 py-1 bg-inset text-fg rounded text-sm focus:outline-none focus:ring-2 focus:ring-accent text-right"
       />
     </div>
   )

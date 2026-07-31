@@ -24,7 +24,7 @@ export default function LedgerScreen({
   const isBalanced = totals.difference < 0.01
 
   return (
-    <div className="min-h-screen bg-gray-900 p-4">
+    <div className="min-h-screen bg-app p-4">
       <div className="max-w-md mx-auto">
         <ScreenHeader
           title="Count"
@@ -42,23 +42,23 @@ export default function LedgerScreen({
           ))}
         </div>
 
-        <div className="bg-gray-800 rounded p-3 mb-6">
+        <div className="bg-surface rounded-app border border-border p-3 mb-6">
           <div className="space-y-1 text-sm">
             <div className="flex justify-between">
-              <span className="text-gray-400">In:</span>
-              <span className="text-white">{formatCurrency(totals.totalBuyIns)}</span>
+              <span className="text-fg-muted">In:</span>
+              <span className="text-fg">{formatCurrency(totals.totalBuyIns)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-400">Out:</span>
-              <span className="text-white">{formatCurrency(totals.totalFinal)}</span>
+              <span className="text-fg-muted">Out:</span>
+              <span className="text-fg">{formatCurrency(totals.totalFinal)}</span>
             </div>
-            <div className={`flex justify-between font-medium pt-1 border-t border-gray-700 ${isBalanced ? 'text-green-400' : 'text-red-400'
+            <div className={`flex justify-between font-medium pt-1 border-t border-border ${isBalanced ? 'text-success' : 'text-danger'
               }`}>
               <span>Diff:</span>
               <span>{formatCurrency(totals.difference)}</span>
             </div>
           </div>
-          <div className={`text-center mt-2 text-xs ${isBalanced ? 'text-green-400' : 'text-red-400'
+          <div className={`text-center mt-2 text-xs ${isBalanced ? 'text-success' : 'text-danger'
             }`}>
             {isBalanced ? '✓ Balanced' : '⚠ Check amounts'}
           </div>
@@ -75,13 +75,13 @@ export default function LedgerScreen({
         <div className="flex gap-3">
           <button
             onClick={onGoBack}
-            className="flex-1 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded text-sm"
+            className="flex-1 rounded-[10px] border border-border bg-surface py-3 text-sm font-medium text-fg hover:bg-inset"
           >
             Back
           </button>
           <button
             onClick={onGoToSummary}
-            className="flex-1 py-3 bg-white hover:bg-gray-100 text-black rounded text-sm font-medium"
+            className="flex-1 rounded-[10px] bg-accent py-3 text-sm font-semibold text-accent-contrast hover:opacity-90"
           >
             Summary
           </button>

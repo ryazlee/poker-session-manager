@@ -5,8 +5,23 @@
     <link rel="icon" type="image/png" href="/poker3.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
     <meta name="description" content="Mobile-first poker session manager to track players, buy-ins, and final amounts" />
-    <meta name="theme-color" content="#1a4b3a" />
+    <meta name="theme-color" content="#fafafa" />
     <title>Poker Session Manager</title>
+    <script>
+      try {
+        var saved = localStorage.getItem('poker-session-manager-theme')
+        var dark =
+          saved === 'dark' ||
+          (saved !== 'light' &&
+            window.matchMedia('(prefers-color-scheme: dark)').matches)
+        if (dark) {
+          document.documentElement.classList.add('theme-dark')
+          document
+            .querySelector('meta[name="theme-color"]')
+            ?.setAttribute('content', '#111827')
+        }
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

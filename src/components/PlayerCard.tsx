@@ -36,41 +36,41 @@ export default function PlayerCard({
   }
 
   return (
-    <div className="bg-gray-800 rounded p-3">
+    <div className="bg-surface rounded-app border border-border p-3">
       <div className="flex items-center justify-between">
         <div>
-          <div className="text-white font-medium">{player.name}</div>
-          <div className="text-gray-400 text-sm">
+          <div className="text-fg font-medium">{player.name}</div>
+          <div className="text-fg-muted text-sm">
             {formatCurrency(total)}
-            {count > 0 && <span className="text-gray-500"> · {count}</span>}
+            {count > 0 && <span className="text-fg-muted"> · {count}</span>}
           </div>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => onUpdateBuyIns(player.id, -1)}
             disabled={count === 0}
-            className="w-7 h-7 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 text-white rounded text-sm font-bold"
+            className="w-7 h-7 bg-inset hover:opacity-90 disabled:bg-surface text-fg rounded-app border border-border text-sm font-bold"
           >
             −
           </button>
-          <span className="w-6 text-center text-white text-sm">{count}</span>
+          <span className="w-6 text-center text-fg text-sm">{count}</span>
           <button
             onClick={() => onUpdateBuyIns(player.id, 1)}
-            className="w-7 h-7 bg-gray-700 hover:bg-gray-600 text-white rounded text-sm font-bold"
+            className="w-7 h-7 bg-inset hover:opacity-90 text-fg rounded text-sm font-bold"
             title={`Add ${formatCurrency(buyInAmount)}`}
           >
             +
           </button>
           <button
             onClick={() => setShowCustom(!showCustom)}
-            className={`w-7 h-7 rounded text-sm font-bold ${showCustom ? 'bg-white text-black' : 'bg-gray-700 hover:bg-gray-600 text-white'}`}
+            className={`w-7 h-7 rounded text-sm font-bold ${showCustom ? 'bg-accent text-accent-contrast' : 'bg-inset hover:opacity-90 text-fg'}`}
             title="Custom buy-in"
           >
             $
           </button>
           <button
             onClick={() => onRemove(player.id)}
-            className="w-7 h-7 bg-gray-700 hover:bg-gray-600 text-white rounded text-sm ml-1"
+            className="w-7 h-7 bg-inset hover:opacity-90 text-fg rounded text-sm ml-1"
           >
             ×
           </button>
@@ -85,12 +85,12 @@ export default function PlayerCard({
             onKeyDown={(e) => e.key === 'Enter' && handleAddCustom()}
             placeholder="Amount"
             autoFocus
-            className="flex-1 px-2 py-1 bg-gray-700 text-white rounded text-sm focus:outline-none focus:ring-2 focus:ring-white"
+            className="flex-1 px-2 py-1 bg-inset text-fg rounded text-sm focus:outline-none focus:ring-2 focus:ring-accent"
           />
           <button
             onClick={handleAddCustom}
             disabled={!customAmount || parseFloat(customAmount) <= 0}
-            className="px-3 py-1 bg-white hover:bg-gray-100 disabled:bg-gray-700 text-black disabled:text-gray-500 rounded text-sm font-medium"
+            className="px-3 py-1 bg-accent hover:opacity-90 disabled:bg-inset text-accent-contrast disabled:text-fg-muted rounded text-sm font-medium"
           >
             Add
           </button>

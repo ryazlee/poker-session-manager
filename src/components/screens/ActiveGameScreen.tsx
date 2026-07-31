@@ -29,7 +29,7 @@ export default function ActiveGameScreen({
   formatCurrency
 }: ActiveGameScreenProps) {
   return (
-    <div className="min-h-screen bg-gray-900 p-4">
+    <div className="min-h-screen bg-app p-4">
       <div className="max-w-md mx-auto">
         <ScreenHeader
           title="Game"
@@ -43,12 +43,12 @@ export default function ActiveGameScreen({
             onChange={(e) => setNewPlayerName(e.target.value)}
             placeholder="Player name"
             onKeyDown={(e) => e.key === 'Enter' && onAddPlayer()}
-            className="flex-1 px-3 py-2 bg-gray-800 text-white rounded placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white text-sm"
+            className="flex-1 px-3 py-2 bg-surface text-fg rounded-app border border-border placeholder:text-fg-muted focus:outline-none focus:ring-2 focus:ring-accent text-sm"
           />
           <button
             onClick={onAddPlayer}
             disabled={!newPlayerName.trim()}
-            className="px-4 py-2 bg-white hover:bg-gray-100 disabled:bg-gray-700 text-black disabled:text-gray-500 rounded text-sm font-medium"
+            className="rounded-[10px] bg-accent px-4 py-2 text-sm font-semibold text-accent-contrast hover:opacity-90 disabled:bg-inset disabled:text-fg-muted"
           >
             Add
           </button>
@@ -79,14 +79,14 @@ export default function ActiveGameScreen({
         <div className="flex gap-3">
           <button
             onClick={onReset}
-            className="flex-1 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded text-sm"
+            className="flex-1 rounded-[10px] border border-border bg-surface py-3 text-sm font-medium text-fg hover:bg-inset"
           >
             Reset
           </button>
           <button
             onClick={onGoToLedger}
             disabled={session.players.length === 0}
-            className="flex-1 py-3 bg-white hover:bg-gray-100 disabled:bg-gray-700 text-black disabled:text-gray-500 rounded text-sm font-medium"
+            className="flex-1 rounded-[10px] bg-accent py-3 text-sm font-semibold text-accent-contrast hover:opacity-90 disabled:bg-inset disabled:text-fg-muted"
           >
             Count
           </button>

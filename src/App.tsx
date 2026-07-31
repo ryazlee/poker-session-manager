@@ -4,6 +4,7 @@ import SetupScreen from './components/screens/SetupScreen'
 import ActiveGameScreen from './components/screens/ActiveGameScreen'
 import LedgerScreen from './components/screens/LedgerScreen'
 import SummaryScreen from './components/screens/SummaryScreen'
+import { ThemeProvider } from './theme'
 import {
   getPlayerTotalBuyIn,
   getSessionTotalPot,
@@ -297,18 +298,18 @@ function App() {
 
   const formatCurrency = (amount: number) => amount > 0 ? `$${amount.toFixed(2)}` : `-$${Math.abs(amount).toFixed(2)}`
 
+  let screen = null
+
   if (gameState === 'setup') {
-    return (
+    screen = (
       <SetupScreen
         buyInAmount={buyInAmount}
         setBuyInAmount={setBuyInAmount}
         onStartGame={startNewGame}
       />
     )
-  }
-
-  if (gameState === 'active' && session) {
-    return (
+  } else if (gameState === 'active' && session) {
+    screen = (
       <ActiveGameScreen
         session={session}
         newPlayerName={newPlayerName}
@@ -322,10 +323,8 @@ function App() {
         formatCurrency={formatCurrency}
       />
     )
-  }
-
-  if (gameState === 'ledger' && session) {
-    return (
+  } else if (gameState === 'ledger' && session) {
+    screen = (
       <LedgerScreen
         session={session}
         onUpdateFinalAmount={updateFinalAmount}
@@ -335,10 +334,8 @@ function App() {
         calculateTotals={calculateTotals}
       />
     )
-  }
-
-  if (gameState === 'summary' && session) {
-    return (
+  } else if (gameState === 'summary' && session) {
+    screen = (
       <SummaryScreen
         session={session}
         onGoBack={() => setGameState('ledger')}
@@ -354,7 +351,7 @@ function App() {
     )
   }
 
-  return null
+  return <ThemeProvider>{screen}</ThemeProvider>
 }
 
 export default App

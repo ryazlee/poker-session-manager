@@ -1,6 +1,7 @@
 import React from 'react'
 import { handleCurrencyInput, formatCurrencyInput } from '../../utils/currency'
 import AppIcon from '../AppIcon'
+import ThemeToggle from '../ThemeToggle'
 
 interface SetupScreenProps {
   buyInAmount: string
@@ -16,26 +17,38 @@ export default function SetupScreen({ buyInAmount, setBuyInAmount, onStartGame }
   const displayValue = formatCurrencyInput(buyInAmount)
 
   return (
-    <div className="min-h-screen bg-gray-900 p-6 flex flex-col items-center justify-center">
-      <AppIcon size="lg" className="mb-4" />
-      <h1 className="text-2xl text-white mb-8">Poker Session Manager</h1>
+    <div className="flex min-h-screen flex-col bg-app p-6">
+      <div className="flex justify-end">
+        <ThemeToggle />
+      </div>
 
-      <div className="w-full max-w-xs space-y-4">
-        <input
-          type="text"
-          value={displayValue}
-          onChange={handleBuyInChange}
-          onKeyDown={(e) => e.key === 'Enter' && onStartGame()}
-          className="w-full px-4 py-3 bg-gray-800 text-white rounded placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white"
-          placeholder="Buy-in Amount (e.g., $20)"
-        />
+      <div className="flex flex-1 flex-col items-center justify-center">
+        <AppIcon size="lg" className="mb-4" />
+        <h1 className="mb-2 text-2xl font-semibold tracking-tight text-fg">
+          Poker Session Manager
+        </h1>
+        <p className="mb-8 text-sm text-fg-secondary">
+          Track buy-ins, cashouts, and the pot.
+        </p>
 
-        <button
-          onClick={onStartGame}
-          className="w-full py-3 bg-white text-black rounded font-medium hover:bg-gray-100 transition-colors"
-        >
-          Start
-        </button>
+        <div className="w-full max-w-xs space-y-4">
+          <input
+            type="text"
+            value={displayValue}
+            onChange={handleBuyInChange}
+            onKeyDown={(e) => e.key === 'Enter' && onStartGame()}
+            className="w-full rounded-[10px] border border-border bg-surface px-4 py-3 text-fg placeholder:text-fg-muted focus:outline-none focus:ring-2 focus:ring-accent"
+            placeholder="Buy-in Amount (e.g., $20)"
+          />
+
+          <button
+            type="button"
+            onClick={onStartGame}
+            className="w-full rounded-[10px] bg-accent py-3 font-semibold text-accent-contrast transition-opacity hover:opacity-90"
+          >
+            Start
+          </button>
+        </div>
       </div>
     </div>
   )

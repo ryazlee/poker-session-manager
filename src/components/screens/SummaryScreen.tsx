@@ -29,7 +29,7 @@ export default function SummaryScreen({
   const losers = playersWithPL.filter(p => p.profitLoss < 0)
 
   return (
-    <div className="min-h-screen bg-gray-900 p-4">
+    <div className="min-h-screen bg-app p-4">
       <div className="max-w-md mx-auto">
         <ScreenHeader
           title="Summary"
@@ -38,12 +38,12 @@ export default function SummaryScreen({
 
         {winners.length > 0 && (
           <div className="mb-4">
-            <h2 className="text-green-400 text-sm mb-2">🏆 Winners</h2>
+            <h2 className="text-success text-sm mb-2">🏆 Winners</h2>
             <div className="space-y-1">
               {winners.map((player) => (
-                <div key={player.id} className="bg-gray-800 rounded p-2 flex justify-between items-center">
-                  <span className="text-white text-sm">{player.name}</span>
-                  <span className="text-green-400 text-sm font-mono">+{formatCurrency(player.profitLoss)}</span>
+                <div key={player.id} className="bg-surface rounded-app border border-border p-2 flex justify-between items-center">
+                  <span className="text-fg text-sm">{player.name}</span>
+                  <span className="text-success text-sm font-mono">+{formatCurrency(player.profitLoss)}</span>
                 </div>
               ))}
             </div>
@@ -52,12 +52,12 @@ export default function SummaryScreen({
 
         {losers.length > 0 && (
           <div className="mb-4">
-            <h2 className="text-red-400 text-sm mb-2">📉 Losses</h2>
+            <h2 className="text-danger text-sm mb-2">📉 Losses</h2>
             <div className="space-y-1">
               {losers.map((player) => (
-                <div key={player.id} className="bg-gray-800 rounded p-2 flex justify-between items-center">
-                  <span className="text-white text-sm">{player.name}</span>
-                  <span className="text-red-400 text-sm font-mono">{formatCurrency(player.profitLoss)}</span>
+                <div key={player.id} className="bg-surface rounded-app border border-border p-2 flex justify-between items-center">
+                  <span className="text-fg text-sm">{player.name}</span>
+                  <span className="text-danger text-sm font-mono">{formatCurrency(player.profitLoss)}</span>
                 </div>
               ))}
             </div>
@@ -66,31 +66,31 @@ export default function SummaryScreen({
 
         {breakEven.length > 0 && (
           <div className="mb-4">
-            <h2 className="text-gray-400 text-sm mb-2">⚖️ Break Even</h2>
+            <h2 className="text-fg-muted text-sm mb-2">⚖️ Break Even</h2>
             <div className="space-y-1">
               {breakEven.map((player) => (
-                <div key={player.id} className="bg-gray-800 rounded p-2 flex justify-between items-center">
-                  <span className="text-white text-sm">{player.name}</span>
-                  <span className="text-gray-400 text-sm font-mono">$0.00</span>
+                <div key={player.id} className="bg-surface rounded-app border border-border p-2 flex justify-between items-center">
+                  <span className="text-fg text-sm">{player.name}</span>
+                  <span className="text-fg-muted text-sm font-mono">$0.00</span>
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        <div className="bg-gray-800 rounded p-3 mb-6">
+        <div className="bg-surface rounded-app border border-border p-3 mb-6">
           <div className="space-y-1 text-xs">
             <div className="flex justify-between">
-              <span className="text-gray-400">Total Pot:</span>
-              <span className="text-white">{formatCurrency(totals.totalBuyIns)}</span>
+              <span className="text-fg-muted">Total Pot:</span>
+              <span className="text-fg">{formatCurrency(totals.totalBuyIns)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-400">Buy-ins:</span>
-              <span className="text-white">{session.players.reduce((sum, p) => sum + p.buyInAmounts.length, 0)}</span>
+              <span className="text-fg-muted">Buy-ins:</span>
+              <span className="text-fg">{session.players.reduce((sum, p) => sum + p.buyInAmounts.length, 0)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-400">Winner:</span>
-              <span className="text-green-400">{winners[0]?.name || 'None'}</span>
+              <span className="text-fg-muted">Winner:</span>
+              <span className="text-success">{winners[0]?.name || 'None'}</span>
             </div>
           </div>
         </div>
@@ -106,13 +106,13 @@ export default function SummaryScreen({
         <div className="flex gap-3">
           <button
             onClick={onGoBack}
-            className="flex-1 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded text-sm"
+            className="flex-1 rounded-[10px] border border-border bg-surface py-3 text-sm font-medium text-fg hover:bg-inset"
           >
             Back
           </button>
           <button
             onClick={onNewGame}
-            className="flex-1 py-3 bg-white hover:bg-gray-100 text-black rounded text-sm font-medium"
+            className="flex-1 rounded-[10px] bg-accent py-3 text-sm font-semibold text-accent-contrast hover:opacity-90"
           >
             New Game
           </button>

@@ -43,10 +43,10 @@ export default function AuditTrail({ auditTrail, formatCurrency, defaultCollapse
   }
 
   return (
-    <div className="bg-gray-800 rounded p-3">
+    <div className="bg-surface rounded-app border border-border p-3">
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="w-full flex items-center justify-between text-left text-sm text-gray-400 hover:text-white"
+        className="w-full flex items-center justify-between text-left text-sm text-fg-muted hover:text-fg"
       >
         <span>🕒 Audit Trail ({auditTrail.length})</span>
         <span>{isCollapsed ? '▼' : '▲'}</span>
@@ -59,15 +59,15 @@ export default function AuditTrail({ auditTrail, formatCurrency, defaultCollapse
             const timeDiff = getTimeDiff(entry.timestamp, prevEntry?.timestamp)
 
             return (
-              <div key={entry.id} className="text-xs text-gray-300 bg-gray-700 rounded p-2">
+              <div key={entry.id} className="text-xs text-fg-secondary bg-inset rounded p-2">
                 <div className="flex justify-between items-center">
                   <span className="font-medium">{getActionLabel(entry)}</span>
-                  <span className="text-gray-500">
+                  <span className="text-fg-muted">
                     {formatTime(entry.timestamp)} {timeDiff}
                   </span>
                 </div>
                 {(entry.action === 'rebuy' || entry.action === 'custom_buyin' || entry.action === 'cashout' || entry.action === 'add_player') && (
-                  <div className="text-gray-400">
+                  <div className="text-fg-muted">
                     {entry.amount !== undefined && (
                       <span>{entry.action === 'cashout' ? '−' : '+'}{formatCurrency(entry.amount)}</span>
                     )}
