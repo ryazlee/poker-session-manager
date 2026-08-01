@@ -1,8 +1,11 @@
+export type PlayerStatus = 'active' | 'out'
+
 export interface Player {
   id: string
   name: string
   buyInAmounts: number[]
   finalAmount?: string
+  status?: PlayerStatus
 }
 
 export interface AuditEntry {
@@ -10,7 +13,7 @@ export interface AuditEntry {
   timestamp: Date
   playerId: string
   playerName: string
-  action: 'rebuy' | 'custom_buyin' | 'cashout' | 'add_player' | 'remove_player'
+  action: 'rebuy' | 'custom_buyin' | 'undo_buyin' | 'player_out' | 'add_player' | 'remove_player' | 'cashout'
   amount?: number
   previousTotal?: number
   newTotal?: number

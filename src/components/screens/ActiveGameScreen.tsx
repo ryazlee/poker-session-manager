@@ -1,7 +1,15 @@
-import type { GameSession } from "../../types"
-import PlayerCard from "../PlayerCard"
-import AuditTrail from "../AuditTrail"
-import ScreenHeader from "../ScreenHeader"
+import type { GameSession } from '../../types'
+import PlayerCard from '../PlayerCard'
+import OutPlayerCard from '../OutPlayerCard'
+import AuditTrail from '../AuditTrail'
+import ScreenHeader from '../ScreenHeader'
+import AppShell from '../AppShell'
+import {
+  getActivePlayers,
+  getOutPlayers,
+  getMoneyInPlay,
+  getSessionTotalPot,
+} from '../../utils/buyIns'
 
 interface ActiveGameScreenProps {
   session: GameSession
@@ -10,6 +18,7 @@ interface ActiveGameScreenProps {
   onAddPlayer: () => void
   onUpdateBuyIns: (playerId: string, change: number) => void
   onAddCustomBuyIn: (playerId: string, amount: number) => void
+  onCashOutPlayer: (playerId: string, amount: number) => void
   onRemovePlayer: (playerId: string) => void
   onGoToLedger: () => void
   onReset: () => void
@@ -23,75 +32,112 @@ export default function ActiveGameScreen({
   onAddPlayer,
   onUpdateBuyIns,
   onAddCustomBuyIn,
+  onCashOutPlayer,
   onRemovePlayer,
   onGoToLedger,
   onReset,
   formatCurrency
 }: ActiveGameScreenProps) {
+  const activePlayers = getActivePlayers(session)
+  const outPlayers = getOutPlayers(session)
+  const totalPot = getSessionTotalPot(session)
+  const inPlay = getMoneyInPlay(session)
+
   return (
-    <div className="min-h-screen bg-app p-4">
-      <div className="max-w-md mx-auto">
+    <AppShell
+      header={(
         <ScreenHeader
           title="Game"
           subtitle={`${formatCurrency(session.buyInAmount)} buy-in`}
         />
-
-        <div className="flex gap-2 mb-4">
+      )}
+      footer={(
+        <>
+          <p className="status">
+            Pot {formatCurrency(totalPot)}
+            {outPlayers.length > 0 ? ` · ${formatCurrency(inPlay)} in play` : ''}
+          </p>
+          <div className="actions">
+            <button
+              type="button"
+              onClick={onGoToLedger}
+              disabled={session.players.length === 0}
+              className="btn btn-primary"
+            >
+              Count chips
+            </button>
+            <button
+              type="button"
+              onClick={onReset}
+              className="btn btn-secondary"
+            >
+              Reset
+            </button>
+          </div>
+        </>
+      )}
+    >
+      <div className="stage-scroll">
+        <div className="flex gap-2">
           <input
             type="text"
             value={newPlayerName}
             onChange={(e) => setNewPlayerName(e.target.value)}
             placeholder="Player name"
             onKeyDown={(e) => e.key === 'Enter' && onAddPlayer()}
-            className="flex-1 px-3 py-2 bg-surface text-fg rounded-app border border-border placeholder:text-fg-muted focus:outline-none focus:ring-2 focus:ring-accent text-sm"
+            className="field flex-1 py-2 text-sm"
           />
           <button
+            type="button"
             onClick={onAddPlayer}
             disabled={!newPlayerName.trim()}
-            className="rounded-[10px] bg-accent px-4 py-2 text-sm font-semibold text-accent-contrast hover:opacity-90 disabled:bg-inset disabled:text-fg-muted"
+            className="btn btn-primary px-4 py-2 text-sm"
           >
             Add
           </button>
         </div>
 
-        <div className="space-y-2 mb-6">
-          {session.players.map((player) => (
-            <PlayerCard
-              key={player.id}
-              player={player}
-              buyInAmount={session.buyInAmount}
-              onUpdateBuyIns={onUpdateBuyIns}
-              onAddCustomBuyIn={onAddCustomBuyIn}
-              onRemove={onRemovePlayer}
-              formatCurrency={formatCurrency}
-            />
-          ))}
-        </div>
+        {activePlayers.length > 0 && (
+          <section>
+            <p className="section-label mb-2">At the table</p>
+            <div className="flex flex-col gap-2">
+              {activePlayers.map((player) => (
+                <PlayerCard
+                  key={player.id}
+                  player={player}
+                  buyInAmount={session.buyInAmount}
+                  onUpdateBuyIns={onUpdateBuyIns}
+                  onAddCustomBuyIn={onAddCustomBuyIn}
+                  onCashOutPlayer={onCashOutPlayer}
+                  onRemove={onRemovePlayer}
+                  formatCurrency={formatCurrency}
+                />
+              ))}
+            </div>
+          </section>
+        )}
 
-        <div className="mb-6">
-          <AuditTrail
-            auditTrail={session.auditTrail}
-            formatCurrency={formatCurrency}
-            defaultCollapsed={true}
-          />
-        </div>
+        {outPlayers.length > 0 && (
+          <section>
+            <p className="section-label mb-2">Cashed out</p>
+            <div className="flex flex-col gap-2">
+              {outPlayers.map((player) => (
+                <OutPlayerCard
+                  key={player.id}
+                  player={player}
+                  formatCurrency={formatCurrency}
+                />
+              ))}
+            </div>
+          </section>
+        )}
 
-        <div className="flex gap-3">
-          <button
-            onClick={onReset}
-            className="flex-1 rounded-[10px] border border-border bg-surface py-3 text-sm font-medium text-fg hover:bg-inset"
-          >
-            Reset
-          </button>
-          <button
-            onClick={onGoToLedger}
-            disabled={session.players.length === 0}
-            className="flex-1 rounded-[10px] bg-accent py-3 text-sm font-semibold text-accent-contrast hover:opacity-90 disabled:bg-inset disabled:text-fg-muted"
-          >
-            Count
-          </button>
-        </div>
+        <AuditTrail
+          auditTrail={session.auditTrail}
+          formatCurrency={formatCurrency}
+          defaultCollapsed={true}
+        />
       </div>
-    </div>
+    </AppShell>
   )
 }

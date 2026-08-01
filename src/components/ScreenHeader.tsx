@@ -8,15 +8,13 @@ interface ScreenHeaderProps {
 
 export default function ScreenHeader({ title, subtitle }: ScreenHeaderProps) {
   return (
-    <header className="mb-6 flex items-start justify-between gap-3">
-      <div className="min-w-0">
-        <div className="mb-2 flex items-center gap-2">
+    <header className="pageHeader">
+      <div className="brand">
+        <div className="brand-row">
           <AppIcon size="md" />
-          <h1 className="m-0 text-lg font-semibold tracking-tight text-fg">{title}</h1>
+          <h1>{title}</h1>
         </div>
-        {subtitle ? (
-          <p className="m-0 text-sm text-fg-secondary">{subtitle}</p>
-        ) : null}
+        {subtitle ? <p className="subtitle">{subtitle}</p> : null}
       </div>
       <ThemeToggle />
     </header>

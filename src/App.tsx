@@ -11,6 +11,7 @@ import {
   encodeBuyInAmounts,
   decodeBuyInAmounts,
   normalizeSession,
+  isPlayerOut,
 } from './utils/buyIns'
 
 // URL state encoding/decoding utilities
@@ -25,6 +26,9 @@ function encodeSessionToURL(session: GameSession, gameState: GameState): string 
     const parts = [encodeURIComponent(p.name), encodeBuyInAmounts(p.buyInAmounts)]
     if (p.finalAmount !== undefined) {
       parts.push(p.finalAmount)
+    }
+    if (p.status === 'out') {
+      parts.push('out')
     }
     return parts.join(':')
   })
@@ -46,12 +50,27 @@ function decodeSessionFromURL(hash: string): { session: GameSession; gameState: 
     if (isNaN(buyIn) || !state) return null
 
     const players: Player[] = playersStr ? playersStr.split(',').map((p, i) => {
-      const [name, buyInsEncoded, finalAmount] = p.split(':')
+      const [name, buyInsEncoded, ...rest] = p.split(':')
+      let finalAmount: string | undefined
+      let status: Player['status'] = 'active'
+
+      if (rest.length === 1) {
+        if (rest[0] === 'out') {
+          status = 'out'
+        } else {
+          finalAmount = rest[0]
+        }
+      } else if (rest.length >= 2) {
+        finalAmount = rest[0]
+        status = rest[1] === 'out' ? 'out' : 'active'
+      }
+
       return {
         id: Date.now().toString() + i,
         name: decodeURIComponent(name),
         buyInAmounts: decodeBuyInAmounts(buyInsEncoded, buyIn),
-        finalAmount: finalAmount
+        finalAmount,
+        status,
       }
     }) : []
 
@@ -155,7 +174,8 @@ function App() {
     const newPlayer: Player = {
       id: Date.now().toString(),
       name: newPlayerName.trim(),
-      buyInAmounts: [session.buyInAmount]
+      buyInAmounts: [session.buyInAmount],
+      status: 'active',
     }
 
     const updatedSession = {
@@ -180,7 +200,7 @@ function App() {
     if (!session || change === 0) return
 
     const player = session.players.find(p => p.id === playerId)
-    if (!player) return
+    if (!player || isPlayerOut(player)) return
 
     const previousTotal = getPlayerTotalBuyIn(player)
     let newAmounts: number[]
@@ -207,7 +227,7 @@ function App() {
     addAuditEntry({
       playerId: player.id,
       playerName: player.name,
-      action: change > 0 ? 'rebuy' : 'cashout',
+      action: change > 0 ? 'rebuy' : 'undo_buyin',
       amount,
       previousTotal,
       newTotal,
@@ -218,7 +238,7 @@ function App() {
     if (!session || amount <= 0) return
 
     const player = session.players.find(p => p.id === playerId)
-    if (!player) return
+    if (!player || isPlayerOut(player)) return
 
     const previousTotal = getPlayerTotalBuyIn(player)
     const newAmounts = [...player.buyInAmounts, amount]
@@ -243,11 +263,42 @@ function App() {
     }, getSessionTotalPot(updatedSession))
   }
 
+  const cashOutPlayer = (playerId: string, amount: number) => {
+    if (!session || amount < 0) return
+
+    const player = session.players.find(p => p.id === playerId)
+    if (!player || isPlayerOut(player)) return
+
+    const updatedSession = {
+      ...session,
+      players: session.players.map(p =>
+        p.id === playerId
+          ? {
+              ...p,
+              status: 'out' as const,
+              finalAmount: amount.toString(),
+            }
+          : p
+      )
+    }
+
+    setSession(updatedSession)
+
+    addAuditEntry({
+      playerId: player.id,
+      playerName: player.name,
+      action: 'player_out',
+      amount,
+      previousTotal: getPlayerTotalBuyIn(player),
+      newTotal: amount,
+    }, getSessionTotalPot(updatedSession))
+  }
+
   const removePlayer = (playerId: string) => {
     if (!session) return
 
     const player = session.players.find(p => p.id === playerId)
-    if (!player) return
+    if (!player || isPlayerOut(player)) return
 
     const updatedSession = {
       ...session,
@@ -317,6 +368,7 @@ function App() {
         onAddPlayer={addPlayer}
         onUpdateBuyIns={updateBuyIns}
         onAddCustomBuyIn={addCustomBuyIn}
+        onCashOutPlayer={cashOutPlayer}
         onRemovePlayer={removePlayer}
         onGoToLedger={() => setGameState('ledger')}
         onReset={resetGame}

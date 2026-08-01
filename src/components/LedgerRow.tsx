@@ -1,7 +1,7 @@
 import React from 'react'
-import type { Player } from "../types"
+import type { Player } from '../types'
 import { handleCurrencyInput, formatCurrencyInput } from '../utils/currency'
-import { getPlayerTotalBuyIn } from '../utils/buyIns'
+import { getPlayerTotalBuyIn, isPlayerOut } from '../utils/buyIns'
 
 interface LedgerRowProps {
   player: Player
@@ -15,20 +15,28 @@ export default function LedgerRow({ player, onUpdateFinalAmount, formatCurrency 
   }
 
   const displayValue = formatCurrencyInput(player.finalAmount || '')
+  const out = isPlayerOut(player)
 
   return (
-    <div className="bg-surface rounded-app border border-border p-3 flex items-center justify-between">
-      <div>
-        <div className="text-fg font-medium text-sm">{player.name}</div>
-        <div className="text-fg-muted text-xs">{formatCurrency(getPlayerTotalBuyIn(player))} in</div>
+    <div className="surface-card flex items-center justify-between gap-3">
+      <div className="min-w-0">
+        <div className="text-sm font-medium text-fg">{player.name}</div>
+        <div className="text-xs text-fg-secondary">
+          {formatCurrency(getPlayerTotalBuyIn(player))} in
+          {out ? ' · cashed out early' : ''}
+        </div>
       </div>
-      <input
-        type="text"
-        value={displayValue}
-        onChange={handleFinalAmountChange}
-        placeholder="$0.00"
-        className="w-20 px-2 py-1 bg-inset text-fg rounded text-sm focus:outline-none focus:ring-2 focus:ring-accent text-right"
-      />
+      {out ? (
+        <span className="text-sm font-medium text-fg">{displayValue || '$0.00'}</span>
+      ) : (
+        <input
+          type="text"
+          value={displayValue}
+          onChange={handleFinalAmountChange}
+          placeholder="$0.00"
+          className="field w-24 px-2 py-1 text-right text-sm"
+        />
+      )}
     </div>
   )
 }

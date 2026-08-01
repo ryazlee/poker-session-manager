@@ -1,7 +1,8 @@
-import type { GameSession } from "../../types"
-import AuditTrail from "../AuditTrail"
-import ScreenHeader from "../ScreenHeader"
-import { getPlayerTotalBuyIn } from "../../utils/buyIns"
+import type { GameSession } from '../../types'
+import AuditTrail from '../AuditTrail'
+import ScreenHeader from '../ScreenHeader'
+import AppShell from '../AppShell'
+import { getPlayerTotalBuyIn } from '../../utils/buyIns'
 
 interface SummaryScreenProps {
   session: GameSession
@@ -29,95 +30,98 @@ export default function SummaryScreen({
   const losers = playersWithPL.filter(p => p.profitLoss < 0)
 
   return (
-    <div className="min-h-screen bg-app p-4">
-      <div className="max-w-md mx-auto">
+    <AppShell
+      header={(
         <ScreenHeader
           title="Summary"
-          subtitle={`${formatCurrency(session.buyInAmount)} • ${session.players.length} players`}
+          subtitle={`${formatCurrency(session.buyInAmount)} · ${session.players.length} players`}
         />
-
+      )}
+      footer={(
+        <div className="actions">
+          <button
+            type="button"
+            onClick={onNewGame}
+            className="btn btn-primary"
+          >
+            New game
+          </button>
+          <button
+            type="button"
+            onClick={onGoBack}
+            className="btn btn-secondary"
+          >
+            Back
+          </button>
+        </div>
+      )}
+    >
+      <div className="stage-scroll">
         {winners.length > 0 && (
-          <div className="mb-4">
-            <h2 className="text-success text-sm mb-2">🏆 Winners</h2>
-            <div className="space-y-1">
+          <section>
+            <p className="section-label mb-2">Winners</p>
+            <div className="flex flex-col gap-2">
               {winners.map((player) => (
-                <div key={player.id} className="bg-surface rounded-app border border-border p-2 flex justify-between items-center">
-                  <span className="text-fg text-sm">{player.name}</span>
-                  <span className="text-success text-sm font-mono">+{formatCurrency(player.profitLoss)}</span>
+                <div key={player.id} className="surface-card flex items-center justify-between">
+                  <span className="text-sm text-fg">{player.name}</span>
+                  <span className="text-sm font-mono text-success">+{formatCurrency(player.profitLoss)}</span>
                 </div>
               ))}
             </div>
-          </div>
+          </section>
         )}
 
         {losers.length > 0 && (
-          <div className="mb-4">
-            <h2 className="text-danger text-sm mb-2">📉 Losses</h2>
-            <div className="space-y-1">
+          <section>
+            <p className="section-label mb-2">Losses</p>
+            <div className="flex flex-col gap-2">
               {losers.map((player) => (
-                <div key={player.id} className="bg-surface rounded-app border border-border p-2 flex justify-between items-center">
-                  <span className="text-fg text-sm">{player.name}</span>
-                  <span className="text-danger text-sm font-mono">{formatCurrency(player.profitLoss)}</span>
+                <div key={player.id} className="surface-card flex items-center justify-between">
+                  <span className="text-sm text-fg">{player.name}</span>
+                  <span className="text-sm font-mono text-danger">{formatCurrency(player.profitLoss)}</span>
                 </div>
               ))}
             </div>
-          </div>
+          </section>
         )}
 
         {breakEven.length > 0 && (
-          <div className="mb-4">
-            <h2 className="text-fg-muted text-sm mb-2">⚖️ Break Even</h2>
-            <div className="space-y-1">
+          <section>
+            <p className="section-label mb-2">Break even</p>
+            <div className="flex flex-col gap-2">
               {breakEven.map((player) => (
-                <div key={player.id} className="bg-surface rounded-app border border-border p-2 flex justify-between items-center">
-                  <span className="text-fg text-sm">{player.name}</span>
-                  <span className="text-fg-muted text-sm font-mono">$0.00</span>
+                <div key={player.id} className="surface-card flex items-center justify-between">
+                  <span className="text-sm text-fg">{player.name}</span>
+                  <span className="text-sm font-mono text-fg-muted">$0.00</span>
                 </div>
               ))}
             </div>
-          </div>
+          </section>
         )}
 
-        <div className="bg-surface rounded-app border border-border p-3 mb-6">
+        <div className="surface-card">
           <div className="space-y-1 text-xs">
             <div className="flex justify-between">
-              <span className="text-fg-muted">Total Pot:</span>
+              <span className="text-fg-secondary">Total pot:</span>
               <span className="text-fg">{formatCurrency(totals.totalBuyIns)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-fg-muted">Buy-ins:</span>
+              <span className="text-fg-secondary">Buy-ins:</span>
               <span className="text-fg">{session.players.reduce((sum, p) => sum + p.buyInAmounts.length, 0)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-fg-muted">Winner:</span>
+              <span className="text-fg-secondary">Top winner:</span>
               <span className="text-success">{winners[0]?.name || 'None'}</span>
             </div>
           </div>
         </div>
 
-        <div className="mb-6">
-          <AuditTrail
-            auditTrail={session.auditTrail}
-            formatCurrency={formatCurrency}
-            defaultCollapsed={true}
-          />
-        </div>
-
-        <div className="flex gap-3">
-          <button
-            onClick={onGoBack}
-            className="flex-1 rounded-[10px] border border-border bg-surface py-3 text-sm font-medium text-fg hover:bg-inset"
-          >
-            Back
-          </button>
-          <button
-            onClick={onNewGame}
-            className="flex-1 rounded-[10px] bg-accent py-3 text-sm font-semibold text-accent-contrast hover:opacity-90"
-          >
-            New Game
-          </button>
-        </div>
+        <AuditTrail
+          auditTrail={session.auditTrail}
+          formatCurrency={formatCurrency}
+          defaultCollapsed={true}
+        />
       </div>
-    </div>
+    </AppShell>
   )
 }

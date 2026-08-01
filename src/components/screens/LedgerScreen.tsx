@@ -1,7 +1,9 @@
-import type { GameSession } from "../../types"
-import AuditTrail from "../AuditTrail"
-import LedgerRow from "../LedgerRow"
-import ScreenHeader from "../ScreenHeader"
+import type { GameSession } from '../../types'
+import AuditTrail from '../AuditTrail'
+import LedgerRow from '../LedgerRow'
+import ScreenHeader from '../ScreenHeader'
+import AppShell from '../AppShell'
+import { getActivePlayers, getOutPlayers } from '../../utils/buyIns'
 
 interface LedgerScreenProps {
   session: GameSession
@@ -22,71 +24,97 @@ export default function LedgerScreen({
 }: LedgerScreenProps) {
   const totals = calculateTotals()
   const isBalanced = totals.difference < 0.01
+  const activePlayers = getActivePlayers(session)
+  const outPlayers = getOutPlayers(session)
 
   return (
-    <div className="min-h-screen bg-app p-4">
-      <div className="max-w-md mx-auto">
+    <AppShell
+      header={(
         <ScreenHeader
           title="Count"
           subtitle={`${formatCurrency(session.buyInAmount)} buy-in`}
         />
+      )}
+      footer={(
+        <>
+          <p className={`status ${isBalanced ? '' : 'error'}`}>
+            {isBalanced ? 'Balanced' : `Off by ${formatCurrency(totals.difference)}`}
+          </p>
+          <div className="actions">
+            <button
+              type="button"
+              onClick={onGoToSummary}
+              className="btn btn-primary"
+            >
+              Summary
+            </button>
+            <button
+              type="button"
+              onClick={onGoBack}
+              className="btn btn-secondary"
+            >
+              Back
+            </button>
+          </div>
+        </>
+      )}
+    >
+      <div className="stage-scroll">
+        {outPlayers.length > 0 && (
+          <section>
+            <p className="section-label mb-2">Already out</p>
+            <div className="flex flex-col gap-2">
+              {outPlayers.map((player) => (
+                <LedgerRow
+                  key={player.id}
+                  player={player}
+                  onUpdateFinalAmount={onUpdateFinalAmount}
+                  formatCurrency={formatCurrency}
+                />
+              ))}
+            </div>
+          </section>
+        )}
 
-        <div className="space-y-2 mb-4">
-          {session.players.map((player) => (
-            <LedgerRow
-              key={player.id}
-              player={player}
-              onUpdateFinalAmount={onUpdateFinalAmount}
-              formatCurrency={formatCurrency}
-            />
-          ))}
-        </div>
+        {activePlayers.length > 0 && (
+          <section>
+            <p className="section-label mb-2">Still in</p>
+            <div className="flex flex-col gap-2">
+              {activePlayers.map((player) => (
+                <LedgerRow
+                  key={player.id}
+                  player={player}
+                  onUpdateFinalAmount={onUpdateFinalAmount}
+                  formatCurrency={formatCurrency}
+                />
+              ))}
+            </div>
+          </section>
+        )}
 
-        <div className="bg-surface rounded-app border border-border p-3 mb-6">
+        <div className="surface-card">
           <div className="space-y-1 text-sm">
             <div className="flex justify-between">
-              <span className="text-fg-muted">In:</span>
+              <span className="text-fg-secondary">Total in:</span>
               <span className="text-fg">{formatCurrency(totals.totalBuyIns)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-fg-muted">Out:</span>
+              <span className="text-fg-secondary">Total out:</span>
               <span className="text-fg">{formatCurrency(totals.totalFinal)}</span>
             </div>
-            <div className={`flex justify-between font-medium pt-1 border-t border-border ${isBalanced ? 'text-success' : 'text-danger'
-              }`}>
+            <div className={`flex justify-between border-t border-border pt-2 font-medium ${isBalanced ? 'text-success' : 'text-danger'}`}>
               <span>Diff:</span>
               <span>{formatCurrency(totals.difference)}</span>
             </div>
           </div>
-          <div className={`text-center mt-2 text-xs ${isBalanced ? 'text-success' : 'text-danger'
-            }`}>
-            {isBalanced ? '✓ Balanced' : '⚠ Check amounts'}
-          </div>
         </div>
 
-        <div className="mb-6">
-          <AuditTrail
-            auditTrail={session.auditTrail}
-            formatCurrency={formatCurrency}
-            defaultCollapsed={true}
-          />
-        </div>
-
-        <div className="flex gap-3">
-          <button
-            onClick={onGoBack}
-            className="flex-1 rounded-[10px] border border-border bg-surface py-3 text-sm font-medium text-fg hover:bg-inset"
-          >
-            Back
-          </button>
-          <button
-            onClick={onGoToSummary}
-            className="flex-1 rounded-[10px] bg-accent py-3 text-sm font-semibold text-accent-contrast hover:opacity-90"
-          >
-            Summary
-          </button>
-        </div>
+        <AuditTrail
+          auditTrail={session.auditTrail}
+          formatCurrency={formatCurrency}
+          defaultCollapsed={true}
+        />
       </div>
-    </div>
+    </AppShell>
   )
 }

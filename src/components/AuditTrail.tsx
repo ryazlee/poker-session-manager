@@ -13,15 +13,24 @@ function getActionLabel(entry: AuditEntry): string {
       return `${entry.playerName} rebuy`
     case 'custom_buyin':
       return `${entry.playerName} custom buy-in`
+    case 'undo_buyin':
     case 'cashout':
-      return `${entry.playerName} cashout`
+      return `${entry.playerName} undo buy-in`
+    case 'player_out':
+      return `${entry.playerName} cashed out`
     case 'add_player':
       return `${entry.playerName} joined`
     case 'remove_player':
-      return `${entry.playerName} left`
+      return `${entry.playerName} removed`
     default:
       return entry.playerName
   }
+}
+
+function getAmountPrefix(action: AuditEntry['action']): string {
+  if (action === 'undo_buyin' || action === 'cashout') return '−'
+  if (action === 'player_out') return ''
+  return '+'
 }
 
 export default function AuditTrail({ auditTrail, formatCurrency, defaultCollapsed = true }: AuditTrailProps) {
@@ -43,45 +52,52 @@ export default function AuditTrail({ auditTrail, formatCurrency, defaultCollapse
   }
 
   return (
-    <div className="bg-surface rounded-app border border-border p-3">
-      <button
-        onClick={() => setIsCollapsed(!isCollapsed)}
-        className="w-full flex items-center justify-between text-left text-sm text-fg-muted hover:text-fg"
-      >
-        <span>🕒 Audit Trail ({auditTrail.length})</span>
-        <span>{isCollapsed ? '▼' : '▲'}</span>
-      </button>
+    <section className="history">
+      <div className="history-header">
+        <p className="section-label">Buy-in log</p>
+        <button
+          type="button"
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="text-btn"
+        >
+          {isCollapsed ? 'Show' : 'Hide'}
+        </button>
+      </div>
 
       {!isCollapsed && (
-        <div className="mt-3 space-y-1 max-h-40 overflow-y-auto">
+        <ul className="history-list">
           {entries.map((entry, index) => {
             const prevEntry = entries[index + 1]
             const timeDiff = getTimeDiff(entry.timestamp, prevEntry?.timestamp)
+            const showDetails = entry.action !== 'remove_player'
 
             return (
-              <div key={entry.id} className="text-xs text-fg-secondary bg-inset rounded p-2">
-                <div className="flex justify-between items-center">
-                  <span className="font-medium">{getActionLabel(entry)}</span>
-                  <span className="text-fg-muted">
-                    {formatTime(entry.timestamp)} {timeDiff}
-                  </span>
+              <li key={entry.id} className="history-item">
+                <div className="min-w-0">
+                  <div className="history-text">{getActionLabel(entry)}</div>
+                  {showDetails && (
+                    <div className="history-meta">
+                      {entry.amount !== undefined && (
+                        <span>{getAmountPrefix(entry.action)}{formatCurrency(entry.amount)}</span>
+                      )}
+                      {entry.newTotal !== undefined && entry.action !== 'player_out' && (
+                        <span> · In: {formatCurrency(entry.newTotal)}</span>
+                      )}
+                      {entry.action === 'player_out' && entry.newTotal !== undefined && (
+                        <span> · Left with {formatCurrency(entry.newTotal)}</span>
+                      )}
+                      <span> · Pot {formatCurrency(entry.totalPot)}</span>
+                    </div>
+                  )}
                 </div>
-                {(entry.action === 'rebuy' || entry.action === 'custom_buyin' || entry.action === 'cashout' || entry.action === 'add_player') && (
-                  <div className="text-fg-muted">
-                    {entry.amount !== undefined && (
-                      <span>{entry.action === 'cashout' ? '−' : '+'}{formatCurrency(entry.amount)}</span>
-                    )}
-                    {entry.newTotal !== undefined && (
-                      <span> • Total: {formatCurrency(entry.newTotal)}</span>
-                    )}
-                    <span> • Pot: {formatCurrency(entry.totalPot)}</span>
-                  </div>
-                )}
-              </div>
+                <span className="history-time">
+                  {formatTime(entry.timestamp)} {timeDiff}
+                </span>
+              </li>
             )
           })}
-        </div>
+        </ul>
       )}
-    </div>
+    </section>
   )
 }
