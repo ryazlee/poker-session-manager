@@ -16,7 +16,7 @@ export default function AppIcon({ size = 'md', className = '' }: AppIconProps) {
     <img
       src={APP_ICON}
       alt={APP_NAME}
-      className={`${sizes[size]} ${className}`.trim()}
+      className={`${sizes[size]} rounded-[10px] ${className}`.trim()}
     />
   )
 }
