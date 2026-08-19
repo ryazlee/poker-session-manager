@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import MakerCredit from './MakerCredit'
 
 interface AppShellProps {
   header: ReactNode
@@ -14,7 +15,10 @@ export default function AppShell({ header, children, footer, centered = false }:
       <main className={`stage ${centered ? 'stage-centered' : ''}`}>
         {children}
       </main>
-      {footer ? <footer className="controls">{footer}</footer> : null}
+      <footer className="controls">
+        {footer}
+        <MakerCredit />
+      </footer>
     </div>
   )
 }

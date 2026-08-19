@@ -5,6 +5,7 @@ import ActiveGameScreen from './components/screens/ActiveGameScreen'
 import LedgerScreen from './components/screens/LedgerScreen'
 import SummaryScreen from './components/screens/SummaryScreen'
 import { ThemeProvider } from './theme'
+import { trackPageview } from './utils/analytics'
 import {
   getPlayerTotalBuyIn,
   getSessionTotalPot,
@@ -97,6 +98,7 @@ function App() {
 
   // Load session from URL hash first, then localStorage
   useEffect(() => {
+    trackPageview()
     const hash = window.location.hash.slice(1)
     if (hash) {
       const decoded = decodeSessionFromURL(hash)
