@@ -32,18 +32,35 @@ export function getMoneyInPlay(session: GameSession): number {
 }
 
 export function encodeBuyInAmounts(amounts: number[]): string {
+  if (amounts.length === 0) return '0'
   return amounts.join('+')
 }
 
 export function decodeBuyInAmounts(encoded: string, tableBuyIn: number): number[] {
   if (encoded.includes('+')) {
-    return encoded.split('+').map(a => parseFloat(a)).filter(a => !isNaN(a) && a > 0)
+    return encoded
+      .split('+')
+      .map(amount => parseFloat(amount))
+      .filter(amount => !isNaN(amount) && amount > 0)
   }
-  const count = parseInt(encoded, 10)
-  if (!isNaN(count) && count > 0) {
-    return Array(count).fill(tableBuyIn)
+
+  const asFloat = parseFloat(encoded)
+  if (isNaN(asFloat) || asFloat <= 0) return [tableBuyIn]
+
+  const asInt = parseInt(encoded, 10)
+  const isLegacyCount =
+    Number.isInteger(asFloat) &&
+    encoded === String(asInt) &&
+    asInt >= 1 &&
+    asInt <= 9
+
+  // Legacy shared links used a bare integer as a rebuy count (e.g. "2" = two table buy-ins).
+  // Dollar amounts like "20" must decode as a single buy-in, not twenty rebuys.
+  if (isLegacyCount) {
+    return Array(asInt).fill(tableBuyIn)
   }
-  return [tableBuyIn]
+
+  return [asFloat]
 }
 
 export function normalizePlayer(player: Record<string, unknown>, tableBuyIn: number): Player {

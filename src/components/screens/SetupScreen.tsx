@@ -2,7 +2,8 @@ import React from 'react'
 import { handleCurrencyInput, formatCurrencyInput } from '../../utils/currency'
 import AppIcon from '../AppIcon'
 import AppShell from '../AppShell'
-import ThemeToggle from '../ThemeToggle'
+import MakerCredit from '../MakerCredit'
+import PageHeader from '../PageHeader'
 
 interface SetupScreenProps {
   buyInAmount: string
@@ -20,12 +21,7 @@ export default function SetupScreen({ buyInAmount, setBuyInAmount, onStartGame }
   return (
     <AppShell
       centered
-      header={(
-        <header className="pageHeader">
-          <div />
-          <ThemeToggle />
-        </header>
-      )}
+      header={<PageHeader />}
       footer={(
         <>
           <p className="status">Set the table buy-in to start tracking.</p>
@@ -47,6 +43,7 @@ export default function SetupScreen({ buyInAmount, setBuyInAmount, onStartGame }
         <p className="subtitle mt-2 max-w-xs text-balance">
           Track buy-ins, early cashouts, and the pot.
         </p>
+        <MakerCredit />
 
         <div className="mt-8 w-full max-w-xs">
           <input

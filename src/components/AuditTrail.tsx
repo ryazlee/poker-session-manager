@@ -7,30 +7,49 @@ interface AuditTrailProps {
   defaultCollapsed?: boolean
 }
 
-function getActionLabel(entry: AuditEntry): string {
-  switch (entry.action) {
+function getVerb(action: AuditEntry['action']): string {
+  switch (action) {
     case 'rebuy':
-      return `${entry.playerName} rebuy`
+      return 'rebuy'
     case 'custom_buyin':
-      return `${entry.playerName} custom buy-in`
+      return 'custom'
     case 'undo_buyin':
     case 'cashout':
-      return `${entry.playerName} undo buy-in`
+      return 'undo'
     case 'player_out':
-      return `${entry.playerName} cashed out`
+      return 'out'
     case 'add_player':
-      return `${entry.playerName} joined`
+      return 'in'
     case 'remove_player':
-      return `${entry.playerName} removed`
+      return 'removed'
     default:
-      return entry.playerName
+      return ''
   }
 }
 
-function getAmountPrefix(action: AuditEntry['action']): string {
-  if (action === 'undo_buyin' || action === 'cashout') return '−'
-  if (action === 'player_out') return ''
-  return '+'
+function getAmountDisplay(
+  entry: AuditEntry,
+  formatCurrency: (amount: number) => string
+): { text: string; tone: 'plus' | 'minus' | 'neutral' } | null {
+  switch (entry.action) {
+    case 'rebuy':
+    case 'custom_buyin':
+    case 'add_player':
+      return entry.amount !== undefined
+        ? { text: `+${formatCurrency(entry.amount)}`, tone: 'plus' }
+        : null
+    case 'undo_buyin':
+    case 'cashout':
+      return entry.amount !== undefined
+        ? { text: `−${formatCurrency(entry.amount)}`, tone: 'minus' }
+        : null
+    case 'player_out':
+      return entry.newTotal !== undefined
+        ? { text: formatCurrency(entry.newTotal), tone: 'neutral' }
+        : null
+    default:
+      return null
+  }
 }
 
 export default function AuditTrail({ auditTrail, formatCurrency, defaultCollapsed = true }: AuditTrailProps) {
@@ -42,19 +61,13 @@ export default function AuditTrail({ auditTrail, formatCurrency, defaultCollapse
 
   const formatTime = (timestamp: Date) => {
     const date = new Date(timestamp)
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-  }
-
-  const getTimeDiff = (current: Date, previous?: Date) => {
-    if (!previous) return ''
-    const diff = Math.floor((new Date(current).getTime() - new Date(previous).getTime()) / 60000)
-    return diff > 0 ? `+${diff}m` : ''
+    return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
   }
 
   return (
-    <section className="history">
-      <div className="history-header">
-        <p className="section-label">Buy-in log</p>
+    <section className="log">
+      <div className="log-header">
+        <p className="section-label">Buy-in log · {auditTrail.length}</p>
         <button
           type="button"
           onClick={() => setIsCollapsed(!isCollapsed)}
@@ -65,34 +78,25 @@ export default function AuditTrail({ auditTrail, formatCurrency, defaultCollapse
       </div>
 
       {!isCollapsed && (
-        <ul className="history-list">
-          {entries.map((entry, index) => {
-            const prevEntry = entries[index + 1]
-            const timeDiff = getTimeDiff(entry.timestamp, prevEntry?.timestamp)
-            const showDetails = entry.action !== 'remove_player'
+        <ul className="log-list">
+          {entries.map((entry) => {
+            const amount = getAmountDisplay(entry, formatCurrency)
+            const verb = getVerb(entry.action)
 
             return (
-              <li key={entry.id} className="history-item">
-                <div className="min-w-0">
-                  <div className="history-text">{getActionLabel(entry)}</div>
-                  {showDetails && (
-                    <div className="history-meta">
-                      {entry.amount !== undefined && (
-                        <span>{getAmountPrefix(entry.action)}{formatCurrency(entry.amount)}</span>
-                      )}
-                      {entry.newTotal !== undefined && entry.action !== 'player_out' && (
-                        <span> · In: {formatCurrency(entry.newTotal)}</span>
-                      )}
-                      {entry.action === 'player_out' && entry.newTotal !== undefined && (
-                        <span> · Left with {formatCurrency(entry.newTotal)}</span>
-                      )}
-                      <span> · Pot {formatCurrency(entry.totalPot)}</span>
-                    </div>
-                  )}
-                </div>
-                <span className="history-time">
-                  {formatTime(entry.timestamp)} {timeDiff}
+              <li key={entry.id} className="log-item">
+                <span className="log-main">
+                  <span className="log-name">{entry.playerName}</span>
+                  <span className="log-verb">{verb}</span>
                 </span>
+                {amount ? (
+                  <span className={`log-amount log-amount--${amount.tone}`}>
+                    {amount.text}
+                  </span>
+                ) : (
+                  <span className="log-amount log-amount--empty" aria-hidden="true" />
+                )}
+                <span className="log-time">{formatTime(entry.timestamp)}</span>
               </li>
             )
           })}

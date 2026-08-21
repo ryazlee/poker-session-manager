@@ -141,9 +141,11 @@ function App() {
     }
   }, [session])
 
-  const addAuditEntry = (entry: Omit<AuditEntry, 'id' | 'timestamp' | 'totalPot'>, totalPot: number) => {
-    if (!session) return
-
+  const addAuditEntry = (
+    sessionSnapshot: GameSession,
+    entry: Omit<AuditEntry, 'id' | 'timestamp' | 'totalPot'>
+  ) => {
+    const totalPot = getSessionTotalPot(sessionSnapshot)
     const auditEntry: AuditEntry = {
       ...entry,
       id: Date.now().toString(),
@@ -151,10 +153,10 @@ function App() {
       totalPot
     }
 
-    setSession(prev => prev ? {
-      ...prev,
-      auditTrail: [...prev.auditTrail, auditEntry]
-    } : null)
+    return {
+      ...sessionSnapshot,
+      auditTrail: [...sessionSnapshot.auditTrail, auditEntry]
+    }
   }
 
   const startNewGame = () => {
@@ -180,21 +182,18 @@ function App() {
       status: 'active',
     }
 
-    const updatedSession = {
+    const updatedSession = addAuditEntry({
       ...session,
       players: [...session.players, newPlayer]
-    }
-
-    setSession(updatedSession)
-
-    addAuditEntry({
+    }, {
       playerId: newPlayer.id,
       playerName: newPlayer.name,
       action: 'add_player',
       amount: session.buyInAmount,
       newTotal: session.buyInAmount,
-    }, getSessionTotalPot(updatedSession))
+    })
 
+    setSession(updatedSession)
     setNewPlayerName('')
   }
 
@@ -217,23 +216,19 @@ function App() {
     const newTotal = newAmounts.reduce((sum, a) => sum + a, 0)
     const amount = Math.abs(newTotal - previousTotal)
 
-    const updatedSession = {
+    setSession(addAuditEntry({
       ...session,
       players: session.players.map(p =>
         p.id === playerId ? { ...p, buyInAmounts: newAmounts } : p
       )
-    }
-
-    setSession(updatedSession)
-
-    addAuditEntry({
+    }, {
       playerId: player.id,
       playerName: player.name,
       action: change > 0 ? 'rebuy' : 'undo_buyin',
       amount,
       previousTotal,
       newTotal,
-    }, getSessionTotalPot(updatedSession))
+    }))
   }
 
   const addCustomBuyIn = (playerId: string, amount: number) => {
@@ -246,23 +241,19 @@ function App() {
     const newAmounts = [...player.buyInAmounts, amount]
     const newTotal = previousTotal + amount
 
-    const updatedSession = {
+    setSession(addAuditEntry({
       ...session,
       players: session.players.map(p =>
         p.id === playerId ? { ...p, buyInAmounts: newAmounts } : p
       )
-    }
-
-    setSession(updatedSession)
-
-    addAuditEntry({
+    }, {
       playerId: player.id,
       playerName: player.name,
       action: 'custom_buyin',
       amount,
       previousTotal,
       newTotal,
-    }, getSessionTotalPot(updatedSession))
+    }))
   }
 
   const cashOutPlayer = (playerId: string, amount: number) => {
@@ -271,7 +262,7 @@ function App() {
     const player = session.players.find(p => p.id === playerId)
     if (!player || isPlayerOut(player)) return
 
-    const updatedSession = {
+    setSession(addAuditEntry({
       ...session,
       players: session.players.map(p =>
         p.id === playerId
@@ -282,18 +273,14 @@ function App() {
             }
           : p
       )
-    }
-
-    setSession(updatedSession)
-
-    addAuditEntry({
+    }, {
       playerId: player.id,
       playerName: player.name,
       action: 'player_out',
       amount,
       previousTotal: getPlayerTotalBuyIn(player),
       newTotal: amount,
-    }, getSessionTotalPot(updatedSession))
+    }))
   }
 
   const removePlayer = (playerId: string) => {
@@ -302,18 +289,14 @@ function App() {
     const player = session.players.find(p => p.id === playerId)
     if (!player || isPlayerOut(player)) return
 
-    const updatedSession = {
+    setSession(addAuditEntry({
       ...session,
       players: session.players.filter(p => p.id !== playerId)
-    }
-
-    setSession(updatedSession)
-
-    addAuditEntry({
+    }, {
       playerId: player.id,
       playerName: player.name,
       action: 'remove_player',
-    }, getSessionTotalPot(updatedSession))
+    }))
   }
 
   const updateFinalAmount = (playerId: string, amount: string) => {

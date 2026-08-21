@@ -111,19 +111,37 @@ textarea {
   height: 100svh;
   max-height: 100svh;
   margin: 0 auto;
-  padding: 0.75rem 1rem calc(1rem + env(safe-area-inset-bottom, 0px));
+  padding: 0.5rem 1rem calc(0.75rem + env(safe-area-inset-bottom, 0px));
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
-  gap: 0.75rem;
+  gap: 0.5rem;
   overflow: hidden;
 }
 
 .pageHeader {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
+  gap: 0.5rem;
   min-width: 0;
+}
+
+.pageHeader-title {
+  margin: 0;
+  min-width: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pageHeader-meta {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--text-secondary);
 }
 
 .brand {
@@ -138,17 +156,17 @@ textarea {
 
 .pageHeader h1 {
   margin: 0;
-  font-size: 1.125rem;
+  font-size: 1rem;
   font-weight: 600;
   letter-spacing: -0.02em;
-  line-height: 1.25;
+  line-height: 1.2;
 }
 
 .subtitle {
-  margin: 0.25rem 0 0;
+  margin: 0.15rem 0 0;
   color: var(--text-secondary);
-  font-size: 0.8125rem;
-  line-height: 1.4;
+  font-size: 0.75rem;
+  line-height: 1.3;
 }
 
 .stage {
@@ -172,6 +190,7 @@ textarea {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  padding-bottom: 0.25rem;
 }
 
 .controls {
@@ -239,68 +258,98 @@ textarea {
   cursor: not-allowed;
 }
 
-.history {
+.log {
   flex: 0 0 auto;
   display: flex;
   flex-direction: column;
-  text-align: left;
   overflow: hidden;
 }
 
-.history-header {
+.log-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
 }
 
-.history-list {
+.log-list {
   list-style: none;
   margin: 0.35rem 0 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  max-height: 7.05rem;
+  max-height: 8.5rem;
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  background: var(--surface);
-  overflow-x: hidden;
+  background: var(--inset);
+  overflow: hidden;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
 
-.history-item {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-  min-height: 2.35rem;
-  padding: 0.4rem 0.75rem;
-  border-bottom: 1px solid var(--border);
+.log-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
 }
 
-.history-item:last-child {
+.log-item:last-child {
   border-bottom: none;
 }
 
-.history-text {
+.log-main {
   min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+
+.log-name {
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--text);
-  overflow-wrap: anywhere;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.history-meta {
-  margin-top: 0.1rem;
-  font-size: 0.75rem;
-  color: var(--text-muted);
-}
-
-.history-time {
+.log-verb {
   flex-shrink: 0;
-  color: var(--text-muted);
   font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.log-amount {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.log-amount--plus {
+  color: var(--success);
+}
+
+.log-amount--minus {
+  color: var(--danger);
+}
+
+.log-amount--neutral {
+  color: var(--text-secondary);
+}
+
+.log-amount--empty {
+  width: 3rem;
+}
+
+.log-time {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .field {
@@ -337,13 +386,41 @@ textarea {
   color: var(--danger);
 }
 
+.landing-credit {
+  margin: 0.75rem 0 0;
+  font-size: 0.8125rem;
+  font-style: italic;
+  color: var(--text-muted);
+}
+
+.landing-credit a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.landing-credit a:hover {
+  color: var(--text-secondary);
+}
+
+.pageHeader-spacer {
+  flex: 1;
+  min-width: 0;
+}
+
+.pageHeader .theme-toggle {
+  width: 2.25rem;
+  height: 2.25rem;
+  font-size: 1rem;
+}
+
 @media (min-width: 768px) {
   .app {
-    padding: 1.25rem 2rem 1.5rem;
+    padding: 1rem 2rem 1.25rem;
   }
 
+  .pageHeader-title,
   .pageHeader h1 {
-    font-size: 1.25rem;
+    font-size: 1.0625rem;
   }
 }
 
@@ -368,22 +445,6 @@ textarea {
   background: color-mix(in srgb, var(--text) 5%, transparent);
 }
 
-.maker {
-  margin: 0;
-  font-size: 0.8125rem;
-  font-style: italic;
-  color: var(--text-muted);
-  text-align: center;
-}
-
-.maker a {
-  color: inherit;
-  text-decoration: none;
-}
-
-.maker a:hover {
-  color: var(--text-secondary);
-}
 
 .section-label {
   margin: 0;
